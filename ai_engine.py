@@ -13,6 +13,21 @@ def count_keyword_hits(text: str, keywords: list):
     return hits
 
 
+def get_signal_label(score: int):
+    """
+    Convert numeric Leadership Signal Score into a plain-English label.
+    """
+
+    if score >= 80:
+        return "Strong"
+    elif score >= 65:
+        return "Stable"
+    elif score >= 50:
+        return "Cautious"
+    else:
+        return "Concerning"
+
+
 def generate_executive_brief(ticker: str, sec_data: dict):
     """
     Phase 1 local intelligence engine.
@@ -23,6 +38,7 @@ def generate_executive_brief(ticker: str, sec_data: dict):
 
     narrative_chunks = sec_data.get("narrative_chunks", [])
     combined_text = " ".join(narrative_chunks)
+    lower_text = combined_text.lower()
 
     risk_keywords = [
         "risk",
@@ -36,6 +52,11 @@ def generate_executive_brief(ticker: str, sec_data: dict):
         "supply",
         "foreign exchange",
         "interest rate",
+        "macroeconomic",
+        "inflation",
+        "decline",
+        "adverse",
+        "weakness",
     ]
 
     growth_keywords = [
@@ -48,6 +69,10 @@ def generate_executive_brief(ticker: str, sec_data: dict):
         "revenue",
         "innovation",
         "investment",
+        "expansion",
+        "opportunity",
+        "platform",
+        "ecosystem",
     ]
 
     capital_allocation_keywords = [
@@ -59,11 +84,36 @@ def generate_executive_brief(ticker: str, sec_data: dict):
         "capital",
         "shareholders",
         "liquidity",
+        "free cash flow",
+        "return capital",
+    ]
+
+    confidence_keywords = [
+        "strong",
+        "record",
+        "increased",
+        "improved",
+        "resilient",
+        "continued",
+        "successful",
+        "leading",
+        "positive",
     ]
 
     risk_score = count_keyword_hits(combined_text, risk_keywords)
     growth_score = count_keyword_hits(combined_text, growth_keywords)
     capital_score = count_keyword_hits(combined_text, capital_allocation_keywords)
+    confidence_score = count_keyword_hits(combined_text, confidence_keywords)
+
+    leadership_signal_score = 60
+
+    leadership_signal_score += min(growth_score, 20)
+    leadership_signal_score += min(capital_score, 10)
+    leadership_signal_score += min(confidence_score, 10)
+    leadership_signal_score -= min(risk_score, 25)
+
+    leadership_signal_score = max(0, min(100, leadership_signal_score))
+    leadership_signal_label = get_signal_label(leadership_signal_score)
 
     if risk_score > growth_score and risk_score > capital_score:
         leadership_tone = "Risk-aware / defensive"
@@ -77,17 +127,23 @@ def generate_executive_brief(ticker: str, sec_data: dict):
     strategic_focus = "Unable to determine strategic focus from available filing narrative."
 
     if growth_score > 0:
-        strategic_focus = "Management language appears focused on products, services, customers, market conditions, and operating performance."
+        strategic_focus = (
+            "Management language appears focused on products, services, customers, "
+            "market conditions, innovation, and operating performance."
+        )
 
     capital_allocation = "No strong capital allocation signal detected."
 
     if capital_score > 0:
-        capital_allocation = "Filing language includes capital allocation themes such as cash, debt, liquidity, dividends, repurchases, or marketable securities."
+        capital_allocation = (
+            "Filing language includes capital allocation themes such as cash, debt, "
+            "liquidity, dividends, repurchases, shareholder returns, or marketable securities."
+        )
 
     risk_themes = []
 
     for keyword in risk_keywords:
-        if keyword.lower() in combined_text.lower():
+        if keyword.lower() in lower_text:
             risk_themes.append(keyword)
 
     risk_themes = list(dict.fromkeys(risk_themes))
@@ -96,18 +152,30 @@ def generate_executive_brief(ticker: str, sec_data: dict):
         f"{ticker.upper()} filing narrative was reviewed across "
         f"{len(narrative_chunks)} extracted business/management chunks. "
         f"CounselIQ detected {risk_score} risk-theme references, "
-        f"{growth_score} growth/operations-theme references, and "
-        f"{capital_score} capital-allocation references."
+        f"{growth_score} growth/operations-theme references, "
+        f"{capital_score} capital-allocation references, and "
+        f"{confidence_score} confidence-language references."
+    )
+
+    leadership_signal_explanation = (
+        f"CounselIQ assigns {ticker.upper()} a Leadership Signal Score of "
+        f"{leadership_signal_score}/100, classified as {leadership_signal_label}. "
+        "This early score weighs growth/operations language, capital allocation language, "
+        "confidence language, and risk-heavy disclosure language."
     )
 
     counseliq_interpretation = (
-        "CounselIQ is beginning to convert raw SEC filings into structured executive intelligence. "
-        "This early local engine uses narrative chunk extraction and theme detection; later versions can add true AI analysis, "
-        "quarter-over-quarter comparison, executive tone shifts, and boardroom signal interpretation."
+        "CounselIQ is converting raw SEC filings into structured executive intelligence. "
+        "This local engine now adds a Leadership Signal Score to make the filing easier to interpret. "
+        "Later versions can add true AI analysis, quarter-over-quarter comparison, earnings call transcripts, "
+        "executive tone shifts, insider activity, and boardroom signal interpretation."
     )
 
     return {
         "executive_summary": executive_summary,
+        "leadership_signal_score": leadership_signal_score,
+        "leadership_signal_label": leadership_signal_label,
+        "leadership_signal_explanation": leadership_signal_explanation,
         "leadership_tone": leadership_tone,
         "strategic_focus": strategic_focus,
         "capital_allocation": capital_allocation,

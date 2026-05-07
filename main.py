@@ -24,12 +24,15 @@ def get_company_brief(ticker: str):
     # Retrieve SEC filing data
     sec_data = get_sec_filing_summary(ticker)
 
-    # Generate AI intelligence brief
+    # Generate intelligence brief
     ai_brief = generate_executive_brief(ticker, sec_data)
 
     return {
         "ticker": ticker.upper(),
         "executive_summary": ai_brief["executive_summary"],
+        "leadership_signal_score": ai_brief["leadership_signal_score"],
+        "leadership_signal_label": ai_brief["leadership_signal_label"],
+        "leadership_signal_explanation": ai_brief["leadership_signal_explanation"],
         "leadership_tone": ai_brief["leadership_tone"],
         "strategic_focus": ai_brief["strategic_focus"],
         "risk_signals": sec_data["risk_flags"],
