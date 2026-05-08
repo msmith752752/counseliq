@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CounselIQ Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #07111f;
+      color: #e8eef7;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #1e3148;
+      padding-bottom: 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: #8fa3bd;
+    }
+
+    .search {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      background: #0d1b2e;
+      border: 1px solid #27405d;
+      color: #fff;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      width: 140px;
+      text-transform: uppercase;
+    }
+
+    button {
+      background: #2d8cff;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      font-size: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: #0d1b2e;
+      border: 1px solid #1e3148;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .hero {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .full { grid-column: span 12; }
+    .half { grid-column: span 6; }
+    .third { grid-column: span 4; }
+    .quarter { grid-column: span 3; }
+
+    .ticker {
+      font-size: 42px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #8fa3bd;
+      margin-top: 8px;
+    }
+
+    .score {
+      font-size: 64px;
+      font-weight: bold;
+      text-align: right;
+      color: #49d17d;
+    }
+
+    .label {
+      text-align: right;
+      color: #8fa3bd;
+      font-size: 18px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    p {
+      line-height: 1.55;
+      color: #cbd7e6;
+    }
+
+    .metric {
+      font-size: 34px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .positive {
+      color: #49d17d;
+    }
+
+    .warning {
+      color: #ffcc66;
+    }
+
+    .negative {
+      color: #ff6b6b;
+    }
+
+    .neutral {
+      color: #8fa3bd;
+    }
+
+    .tone-badge {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #14263c;
+      border: 1px solid #27405d;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #14263c;
+      border: 1px solid #27405d;
+      color: #cbd7e6;
+      padding: 7px 10px;
+      border-radius: 999px;
+      margin: 4px 6px 4px 0;
+      font-size: 13px;
+    }
+
+    .tag-risk {
+      border-color: #ff6b6b;
+      color: #ffb0b0;
+    }
+
+    .tag-capital {
+      border-color: #49d17d;
+      color: #a8efc0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #1e3148;
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: #8fa3bd;
+      font-weight: normal;
+    }
+
+    .muted {
+      color: #8fa3bd;
+    }
+
+    .loading {
+      color: #8fa3bd;
+      margin-top: 20px;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-top: 20px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      background: #07111f;
+      border: 1px solid #1e3148;
+      padding: 16px;
+      border-radius: 10px;
+      color: #cbd7e6;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    a {
+      color: #6eb6ff;
+    }
+
+    ul {
+      margin-top: 8px;
+      padding-left: 20px;
+      color: #cbd7e6;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <h1>CounselIQ</h1>
+        <p>Executive intelligence from SEC filings</p>
+      </div>
+
+      <div class="search">
+        <input id="tickerInput" value="AAPL" />
+        <button onclick="loadBrief()">Analyze</button>
+      </div>
+    </div>
+
+    <div id="status" class="loading">Enter a ticker and click Analyze.</div>
+
+    <div id="dashboard" class="grid" style="display: none;">
+      <div class="card hero">
+        <div>
+          <p class="ticker" id="ticker">--</p>
+          <p class="subtitle" id="tone">Leadership tone loading...</p>
+          <p id="secSummary"></p>
+        </div>
+        <div>
+          <div class="score" id="score">--</div>
+          <div class="label" id="label">Leadership Signal</div>
+        </div>
+      </div>
+
+      <div class="card full">
+        <h2>Filing Comparison Intelligence</h2>
+        <p class="muted" id="comparisonSummary"></p>
+        <div class="tone-badge" id="toneShift">Tone Shift: --</div>
+      </div>
+
+      <div class="card quarter">
+        <h2>Risk Language</h2>
+        <div class="metric" id="riskDelta">--</div>
+        <p id="riskChange" class="muted"></p>
+      </div>
+
+      <div class="card quarter">
+        <h2>Confidence Language</h2>
+        <div class="metric" id="confidenceDelta">--</div>
+        <p id="confidenceChange" class="muted"></p>
+      </div>
+
+      <div class="card quarter">
+        <h2>Liquidity / Debt</h2>
+        <div class="metric" id="liquidityDelta">--</div>
+        <p id="liquidityChange" class="muted"></p>
+      </div>
+
+      <div class="card quarter">
+        <h2>Capital Allocation</h2>
+        <div class="metric" id="capitalDelta">--</div>
+        <p id="capitalChange" class="muted"></p>
+      </div>
+
+      <div class="card half">
+        <h2>New Risk Terms</h2>
+        <div id="newRiskTerms"></div>
+      </div>
+
+      <div class="card half">
+        <h2>Filing Changes Detected</h2>
+        <ul id="filingChanges"></ul>
+      </div>
+
+      <div class="card full">
+        <h2>Executive Summary</h2>
+        <p id="executiveSummary"></p>
+      </div>
+
+      <div class="card half">
+        <h2>Strategic Focus</h2>
+        <p id="strategicFocus"></p>
+      </div>
+
+      <div class="card half">
+        <h2>Leadership Signal Explanation</h2>
+        <p id="signalExplanation"></p>
+      </div>
+
+      <div class="card third">
+        <h2>Risk Themes</h2>
+        <div id="riskThemes"></div>
+      </div>
+
+      <div class="card third">
+        <h2>Capital Allocation</h2>
+        <p id="capitalAllocation"></p>
+      </div>
+
+      <div class="card third">
+        <h2>Insider Activity</h2>
+        <p id="insiderActivity"></p>
+      </div>
+
+      <div class="card full">
+        <h2>Comparable Filing Pair</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Form</th>
+              <th>Filing Date</th>
+              <th>Report Date</th>
+              <th>Document</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTable"></tbody>
+        </table>
+      </div>
+
+      <div class="card full">
+        <h2>Latest SEC Filings Reviewed</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Form</th>
+              <th>Filing Date</th>
+              <th>Report Date</th>
+              <th>Document</th>
+            </tr>
+          </thead>
+          <tbody id="filingsTable"></tbody>
+        </table>
+      </div>
+
+      <div class="card full">
+        <h2>Behind the Scenes: Filing Text Preview</h2>
+        <pre id="filingPreview"></pre>
+      </div>
+
+      <div class="card full">
+        <h2>CounselIQ Interpretation</h2>
+        <p id="interpretation"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatDelta(value) {
+      if (value === undefined || value === null) return "--";
+      if (value > 0) return "+" + value;
+      return String(value);
+    }
+
+    function deltaClass(value, riskDirection = false) {
+      if (value === undefined || value === null) return "metric neutral";
+
+      if (riskDirection) {
+        if (value > 0) return "metric negative";
+        if (value < 0) return "metric positive";
+        return "metric neutral";
+      }
+
+      if (value > 0) return "metric positive";
+      if (value < 0) return "metric negative";
+      return "metric neutral";
+    }
+
+    function toneClass(tone) {
+      const lower = (tone || "").toLowerCase();
+
+      if (lower.includes("defensive")) return "tone-badge negative";
+      if (lower.includes("confident")) return "tone-badge positive";
+      if (lower.includes("mixed")) return "tone-badge warning";
+
+      return "tone-badge neutral";
+    }
+
+    async function loadBrief() {
+      const ticker = document.getElementById("tickerInput").value.trim().toUpperCase();
+      const status = document.getElementById("status");
+      const dashboard = document.getElementById("dashboard");
+
+      if (!ticker) {
+        status.innerHTML = "Please enter a ticker.";
+        status.className = "error";
+        dashboard.style.display = "none";
+        return;
+      }
+
+      status.innerHTML = "Loading CounselIQ intelligence for " + ticker + "...";
+      status.className = "loading";
+      dashboard.style.display = "none";
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/brief/${ticker}`);
+
+        if (!response.ok) {
+          throw new Error("Backend returned status " + response.status);
+        }
+
+        const data = await response.json();
+        const comparison = data.filing_comparison || {};
+
+        document.getElementById("ticker").innerText = data.ticker || ticker;
+        document.getElementById("tone").innerText = data.leadership_tone || "Tone unavailable";
+        document.getElementById("score").innerText = data.leadership_signal_score ?? "--";
+        document.getElementById("label").innerText = data.leadership_signal_label || "Unclassified";
+
+        document.getElementById("secSummary").innerText = data.sec_summary || "";
+        document.getElementById("executiveSummary").innerText = data.executive_summary || "No executive summary available.";
+        document.getElementById("strategicFocus").innerText = data.strategic_focus || "No strategic focus detected.";
+        document.getElementById("signalExplanation").innerText = data.leadership_signal_explanation || "No signal explanation available.";
+        document.getElementById("capitalAllocation").innerText = data.capital_allocation || "No capital allocation signal detected.";
+        document.getElementById("insiderActivity").innerText = data.insider_activity || "No insider activity available.";
+        document.getElementById("interpretation").innerText = data.counseliq_interpretation || "";
+
+        document.getElementById("comparisonSummary").innerText =
+          comparison.summary || "No filing comparison available.";
+
+        const toneShift = document.getElementById("toneShift");
+        toneShift.innerText = "Tone Shift: " + (comparison.tone_shift || "Unavailable");
+        toneShift.className = toneClass(comparison.tone_shift);
+
+        const riskDelta = comparison.risk_language_delta;
+        const confidenceDelta = comparison.confidence_language_delta;
+        const liquidityDelta = comparison.liquidity_debt_language_delta;
+        const capitalDelta = comparison.capital_allocation_language_delta;
+
+        document.getElementById("riskDelta").innerText = formatDelta(riskDelta);
+        document.getElementById("riskDelta").className = deltaClass(riskDelta, true);
+        document.getElementById("riskChange").innerText = comparison.risk_language_change || "";
+
+        document.getElementById("confidenceDelta").innerText = formatDelta(confidenceDelta);
+        document.getElementById("confidenceDelta").className = deltaClass(confidenceDelta, false);
+        document.getElementById("confidenceChange").innerText = comparison.confidence_language_change || "";
+
+        document.getElementById("liquidityDelta").innerText = formatDelta(liquidityDelta);
+        document.getElementById("liquidityDelta").className = deltaClass(liquidityDelta, true);
+        document.getElementById("liquidityChange").innerText = comparison.liquidity_debt_language_change || "";
+
+        document.getElementById("capitalDelta").innerText = formatDelta(capitalDelta);
+        document.getElementById("capitalDelta").className = deltaClass(capitalDelta, false);
+        document.getElementById("capitalChange").innerText = comparison.capital_allocation_language_change || "";
+
+        const newRiskTerms = document.getElementById("newRiskTerms");
+        newRiskTerms.innerHTML = "";
+        if (comparison.new_risk_terms && comparison.new_risk_terms.length > 0) {
+          comparison.new_risk_terms.forEach(term => {
+            const span = document.createElement("span");
+            span.className = "tag tag-risk";
+            span.innerText = term;
+            newRiskTerms.appendChild(span);
+          });
+        } else {
+          newRiskTerms.innerHTML = "<p class='muted'>No newly detected risk terms.</p>";
+        }
+
+        const filingChanges = document.getElementById("filingChanges");
+        filingChanges.innerHTML = "";
+        if (data.filing_changes && data.filing_changes.length > 0) {
+          data.filing_changes.forEach(change => {
+            const li = document.createElement("li");
+            li.innerText = change;
+            filingChanges.appendChild(li);
+          });
+        } else {
+          filingChanges.innerHTML = "<li>No major filing changes detected.</li>";
+        }
+
+        const riskThemes = document.getElementById("riskThemes");
+        riskThemes.innerHTML = "";
+        if (data.risk_themes && data.risk_themes.length > 0) {
+          data.risk_themes.forEach(theme => {
+            const span = document.createElement("span");
+            span.className = "tag";
+            span.innerText = theme;
+            riskThemes.appendChild(span);
+          });
+        } else {
+          riskThemes.innerHTML = "<p class='muted'>No major risk themes detected.</p>";
+        }
+
+        const comparisonTable = document.getElementById("comparisonTable");
+        comparisonTable.innerHTML = "";
+
+        const current = data.selected_filing;
+        const previous = data.previous_comparable_filing;
+
+        if (current) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>Current</td>
+            <td>${current.form || ""}</td>
+            <td>${current.filing_date || ""}</td>
+            <td>${current.report_date || ""}</td>
+            <td><a href="${data.selected_filing_url || "#"}" target="_blank">${current.primary_document || "Open"}</a></td>
+          `;
+          comparisonTable.appendChild(row);
+        }
+
+        if (previous) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>Previous</td>
+            <td>${previous.form || ""}</td>
+            <td>${previous.filing_date || ""}</td>
+            <td>${previous.report_date || ""}</td>
+            <td><a href="${data.previous_filing_url || "#"}" target="_blank">${previous.primary_document || "Open"}</a></td>
+          `;
+          comparisonTable.appendChild(row);
+        }
+
+        if (!current && !previous) {
+          comparisonTable.innerHTML = `
+            <tr>
+              <td colspan="5" class="muted">No comparable filing pair available.</td>
+            </tr>
+          `;
+        }
+
+        const filingsTable = document.getElementById("filingsTable");
+        filingsTable.innerHTML = "";
+        if (data.latest_filings_reviewed && data.latest_filings_reviewed.length > 0) {
+          data.latest_filings_reviewed.forEach(filing => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${filing.form || ""}</td>
+              <td>${filing.filing_date || ""}</td>
+              <td>${filing.report_date || ""}</td>
+              <td>${filing.primary_document || ""}</td>
+            `;
+            filingsTable.appendChild(row);
+          });
+        }
+
+        document.getElementById("filingPreview").innerText =
+          data.selected_filing_text_preview || "No filing preview available.";
+
+        status.innerHTML = "";
+        dashboard.style.display = "grid";
+
+      } catch (error) {
+        status.innerHTML = "Could not load CounselIQ data. Make sure the FastAPI backend is running at http://127.0.0.1:8000.";
+        status.className = "error";
+        dashboard.style.display = "none";
+        console.error(error);
+      }
+    }
+
+    loadBrief();
+  </script>
+</body>
+</html>
