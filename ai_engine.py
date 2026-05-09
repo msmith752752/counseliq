@@ -165,10 +165,11 @@ def generate_executive_brief(ticker: str, sec_data: dict):
     )
 
     counseliq_interpretation = (
-        "CounselIQ is converting raw SEC filings into structured executive intelligence. "
-        "This local engine now adds a Leadership Signal Score to make the filing easier to interpret. "
-        "Later versions can add true AI analysis, quarter-over-quarter comparison, earnings call transcripts, "
-        "executive tone shifts, insider activity, and boardroom signal interpretation."
+        "CounselIQ is evolving from an SEC filing summarizer into a corporate behavioral intelligence engine. "
+        "The platform is designed to identify behind-the-scenes changes in leadership tone, risk disclosure, "
+        "confidence language, liquidity language, legal exposure, and strategic positioning. "
+        "The goal is not to replace investment judgment, but to surface hidden corporate signals that may help "
+        "explain or anticipate stock and options movement before they become obvious in headlines."
     )
 
     return {

@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from sec_engine import get_sec_filing_summary
 from ai_engine import generate_executive_brief
+from quiet_signals_engine import build_quiet_signals
 
 app = FastAPI(
     title="CounselIQ API",
     description="Executive intelligence platform for SEC filings, leadership signals, and corporate strategy.",
-    version="0.2.0",
+    version="0.3.0",
 )
 
 # Allow local dashboard access
@@ -38,6 +39,9 @@ def get_company_brief(ticker: str):
     # Generate executive intelligence layer
     ai_brief = generate_executive_brief(ticker, sec_data)
 
+    # Generate behind-the-scenes quiet signal intelligence
+    quiet_signal_data = build_quiet_signals(ticker, sec_data, ai_brief)
+
     return {
         "ticker": ticker.upper(),
 
@@ -51,6 +55,11 @@ def get_company_brief(ticker: str):
         "capital_allocation": ai_brief["capital_allocation"],
         "risk_themes": ai_brief["risk_themes"],
         "counseliq_interpretation": ai_brief["counseliq_interpretation"],
+
+        # Quiet Signals Engine
+        "quiet_signal_level": quiet_signal_data["quiet_signal_level"],
+        "quiet_signal_summary": quiet_signal_data["quiet_signal_summary"],
+        "quiet_signals": quiet_signal_data["quiet_signals"],
 
         # SEC filing intelligence
         "sec_summary": sec_data["filing_summary"],
