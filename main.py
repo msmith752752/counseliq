@@ -4,11 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sec_engine import get_sec_filing_summary
 from ai_engine import generate_executive_brief
 from quiet_signals_engine import build_quiet_signals
+from market_brief_engine import generate_market_brief
 
 app = FastAPI(
     title="CounselIQ API",
     description="Executive intelligence platform for SEC filings, leadership signals, and corporate strategy.",
-    version="0.3.0",
+    version="0.4.0",
 )
 
 # Allow local dashboard access
@@ -27,7 +28,16 @@ def home():
         "app": "CounselIQ",
         "status": "running",
         "message": "CounselIQ backend is live.",
+        "available_endpoints": [
+            "/brief/{ticker}",
+            "/market-brief",
+        ],
     }
+
+
+@app.get("/market-brief")
+def get_market_brief():
+    return generate_market_brief()
 
 
 @app.get("/brief/{ticker}")
