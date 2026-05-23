@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CounselIQ — Morning Intelligence Brief</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: #07111f;
+      color: #e8eef7;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #1e3148;
+      padding-bottom: 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 32px;
+      font-family: 'Georgia', serif;
+      letter-spacing: -0.5px;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: #8fa3bd;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-link {
+      color: #8fa3bd;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      padding: 8px 14px;
+      border: 1px solid #1e3148;
+      border-radius: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #e8eef7;
+      border-color: #27405d;
+    }
+
+    .nav-link.active {
+      color: #2d8cff;
+      border-color: #2d8cff;
+    }
+
+    .refresh-btn {
+      background: #2d8cff;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+    }
+
+    .refresh-btn:hover { background: #1a7ae8; }
+    .refresh-btn:disabled { background: #1e3148; color: #8fa3bd; cursor: default; }
+
+    /* ── Status / timestamps ── */
+    .brief-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      font-family: Arial, sans-serif;
+    }
+
+    .brief-title {
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 0.02em;
+      color: #e8eef7;
+    }
+
+    .brief-timestamp {
+      font-size: 13px;
+      color: #8fa3bd;
+    }
+
+    /* ── Loading / error ── */
+    .status {
+      color: #8fa3bd;
+      margin-top: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    .status.error { color: #ff6b6b; }
+
+    /* ── Top risk hero ── */
+    .top-risk-banner {
+      background: #0d1b2e;
+      border: 1px solid #ff6b6b44;
+      border-left: 3px solid #ff6b6b;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .top-risk-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ff6b6b;
+      font-family: Arial, sans-serif;
+      margin-bottom: 6px;
+    }
+
+    .top-risk-ticker {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .top-risk-interpretation {
+      font-size: 14px;
+      color: #cbd7e6;
+      line-height: 1.6;
+      font-family: Arial, sans-serif;
+      max-width: 620px;
+    }
+
+    .top-risk-score-wrap {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .top-risk-score {
+      font-size: 56px;
+      font-weight: bold;
+      line-height: 1;
+      color: #ff6b6b;
+    }
+
+    .top-risk-score-label {
+      font-size: 12px;
+      color: #8fa3bd;
+      font-family: Arial, sans-serif;
+      margin-top: 4px;
+    }
+
+    /* ── Ranked table ── */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8fa3bd;
+      font-family: Arial, sans-serif;
+      margin-bottom: 12px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      margin-bottom: 28px;
+    }
+
+    .rank-table th {
+      text-align: left;
+      font-size: 12px;
+      color: #8fa3bd;
+      font-weight: normal;
+      padding: 8px 12px;
+      border-bottom: 1px solid #1e3148;
+      letter-spacing: 0.04em;
+    }
+
+    .rank-table td {
+      padding: 0;
+      border-bottom: 1px solid #111d2e;
+      vertical-align: middle;
+    }
+
+    .rank-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .rank-row:hover { background: #0d1b2e; }
+
+    .rank-row.expanded { background: #0d1b2e; }
+
+    .rank-row td { padding: 14px 12px; }
+
+    .rank-num {
+      font-size: 13px;
+      color: #8fa3bd;
+      font-weight: bold;
+      width: 32px;
+    }
+
+    .rank-ticker {
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      width: 90px;
+    }
+
+    .risk-bar-cell { width: 160px; }
+
+    .risk-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .risk-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: #1e3148;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .risk-score-num {
+      font-size: 14px;
+      font-weight: bold;
+      min-width: 30px;
+      text-align: right;
+    }
+
+    .level-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 1px solid;
+    }
+
+    .pill-severe   { color: #ffb0b0; border-color: #ff6b6b; background: #1a0a0a; }
+    .pill-elevated { color: #ffe0a3; border-color: #ffcc66; background: #1a1400; }
+    .pill-moderate { color: #a3cfff; border-color: #2d8cff; background: #071223; }
+    .pill-watch    { color: #cbd7e6; border-color: #27405d; background: #0d1b2e; }
+    .pill-low      { color: #a8efc0; border-color: #49d17d; background: #071a0e; }
+    .pill-calm     { color: #a8efc0; border-color: #49d17d; background: #071a0e; }
+    .pill-neutral  { color: #8fa3bd; border-color: #27405d; background: #0d1b2e; }
+
+    .quiet-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #27405d;
+      color: #8fa3bd;
+    }
+
+    .quiet-elevated { color: #ffb0b0; border-color: #ff6b6b44; }
+    .quiet-watch    { color: #ffe0a3; border-color: #ffcc6644; }
+    .quiet-calm     { color: #a8efc0; border-color: #49d17d44; }
+
+    .tone-cell {
+      font-size: 13px;
+      color: #8fa3bd;
+      max-width: 200px;
+    }
+
+    .expand-arrow {
+      color: #27405d;
+      font-size: 18px;
+      transition: transform 0.2s;
+      text-align: center;
+      width: 28px;
+    }
+
+    .expand-arrow.open { transform: rotate(180deg); color: #2d8cff; }
+
+    /* ── Expanded detail panel ── */
+    .detail-row { display: none; }
+    .detail-row.open { display: table-row; }
+
+    .detail-panel {
+      background: #07111f;
+      border-bottom: 1px solid #1e3148;
+      padding: 20px 24px 24px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .detail-card {
+      background: #0d1b2e;
+      border: 1px solid #1e3148;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .detail-card-label {
+      font-size: 11px;
+      color: #8fa3bd;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .detail-card-body {
+      font-size: 13px;
+      color: #cbd7e6;
+      line-height: 1.55;
+    }
+
+    .detail-signals {
+      margin-top: 4px;
+    }
+
+    .detail-signal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #cbd7e6;
+    }
+
+    .signal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .dot-high { background: #ff6b6b; }
+    .dot-medium { background: #ffcc66; }
+    .dot-low { background: #49d17d; }
+
+    .detail-filing-changes {
+      font-size: 13px;
+      color: #8fa3bd;
+      padding-left: 16px;
+      margin: 6px 0;
+    }
+
+    .detail-filing-changes li { margin-bottom: 4px; }
+
+    .institution-signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .inst-tag {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #a3cfff;
+      border: 1px solid #2d8cff44;
+      background: #071223;
+    }
+
+    .view-full-btn {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #2d8cff;
+      text-decoration: none;
+      border: 1px solid #2d8cff44;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      background: none;
+    }
+
+    .view-full-btn:hover { background: #071223; }
+
+    /* ── Watchlist editor ── */
+    .watchlist-editor {
+      background: #0d1b2e;
+      border: 1px solid #1e3148;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      font-family: Arial, sans-serif;
+    }
+
+    .watchlist-editor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .watchlist-editor-title {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .ticker-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .ticker-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      background: #14263c;
+      border: 1px solid #27405d;
+      color: #e8eef7;
+    }
+
+    .ticker-tag-remove {
+      color: #8fa3bd;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+
+    .ticker-tag-remove:hover { color: #ff6b6b; }
+
+    .add-ticker-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .add-ticker-input {
+      background: #07111f;
+      border: 1px solid #27405d;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      width: 100px;
+      text-transform: uppercase;
+    }
+
+    .add-ticker-btn {
+      background: #14263c;
+      color: #e8eef7;
+      border: 1px solid #27405d;
+      padding: 8px 14px;
+      font-size: 13px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .add-ticker-btn:hover { background: #1e3148; }
+
+    /* ── Summary stats row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: #0d1b2e;
+      border: 1px solid #1e3148;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #8fa3bd;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: Arial, sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: #8fa3bd;
+      margin-top: 4px;
+      font-family: Arial, sans-serif;
+    }
+
+    @media (max-width: 900px) {
+      .top-risk-banner { flex-direction: column; align-items: flex-start; }
+      .top-risk-score-wrap { text-align: left; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .header { flex-direction: column; align-items: flex-start; gap: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="brand">
+        <h1>CounselIQ</h1>
+        <p>Corporate behavioral intelligence from SEC filings</p>
+      </div>
+      <div class="header-right">
+        <a href="dashboard.html" class="nav-link">Single Ticker</a>
+        <a href="market_brief.html" class="nav-link active">Market Brief</a>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadBrief()">Refresh Brief</button>
+      </div>
+    </div>
+
+    <div id="status" class="status">Loading morning intelligence brief...</div>
+
+    <div id="main" style="display:none;">
+
+      <div class="brief-meta">
+        <div class="brief-title">Morning Intelligence Brief</div>
+        <div class="brief-timestamp" id="timestamp"></div>
+      </div>
+
+      <!-- Watchlist editor -->
+      <div class="watchlist-editor">
+        <div class="watchlist-editor-top">
+          <div class="watchlist-editor-title">Watchlist</div>
+        </div>
+        <div class="ticker-tags" id="tickerTags"></div>
+        <div class="add-ticker-row">
+          <input class="add-ticker-input" id="addTickerInput" placeholder="TICKER" maxlength="6"
+            onkeydown="if(event.key==='Enter') addTicker()" />
+          <button class="add-ticker-btn" onclick="addTicker()">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Summary stats -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- Top risk banner -->
+      <div class="top-risk-banner" id="topRiskBanner"></div>
+
+      <!-- Ranked table -->
+      <div class="section-label">All Tickers — Ranked by Executive Risk</div>
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Ticker</th>
+            <th>Executive Risk</th>
+            <th>Risk Level</th>
+            <th>Quiet Signal</th>
+            <th>Leadership</th>
+            <th>Tone</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <script>
+    let currentTickers = ["AAPL", "NVDA", "MSFT", "JPM", "AMZN"];
+    let briefData = null;
+
+    function riskBarColor(score) {
+      if (score >= 65) return "#ff6b6b";
+      if (score >= 45) return "#ffcc66";
+      if (score >= 25) return "#2d8cff";
+      return "#49d17d";
+    }
+
+    function levelPillClass(level) {
+      const l = (level || "").toLowerCase();
+      if (l === "severe")   return "level-pill pill-severe";
+      if (l === "elevated") return "level-pill pill-elevated";
+      if (l === "moderate") return "level-pill pill-moderate";
+      if (l === "watch")    return "level-pill pill-watch";
+      if (l === "low")      return "level-pill pill-low";
+      return "level-pill pill-neutral";
+    }
+
+    function quietPillClass(level) {
+      const l = (level || "").toLowerCase();
+      if (l === "elevated") return "quiet-pill quiet-elevated";
+      if (l === "watch")    return "quiet-pill quiet-watch";
+      if (l === "calm")     return "quiet-pill quiet-calm";
+      return "quiet-pill";
+    }
+
+    function scoreColor(score) {
+      if (score >= 65) return "#ff6b6b";
+      if (score >= 45) return "#ffcc66";
+      if (score >= 25) return "#2d8cff";
+      return "#49d17d";
+    }
+
+    function dotClass(severity) {
+      const s = (severity || "").toLowerCase();
+      if (s === "high") return "signal-dot dot-high";
+      if (s === "medium") return "signal-dot dot-medium";
+      return "signal-dot dot-low";
+    }
+
+    function renderTickerTags() {
+      const container = document.getElementById("tickerTags");
+      container.innerHTML = "";
+      currentTickers.forEach(ticker => {
+        const tag = document.createElement("div");
+        tag.className = "ticker-tag";
+        tag.innerHTML = `
+          ${ticker}
+          <button class="ticker-tag-remove" onclick="removeTicker('${ticker}')" title="Remove">×</button>
+        `;
+        container.appendChild(tag);
+      });
+    }
+
+    function addTicker() {
+      const input = document.getElementById("addTickerInput");
+      const val = input.value.trim().toUpperCase();
+      if (!val) return;
+      if (currentTickers.includes(val)) { input.value = ""; return; }
+      currentTickers.push(val);
+      input.value = "";
+      renderTickerTags();
+      loadBrief();
+    }
+
+    function removeTicker(ticker) {
+      currentTickers = currentTickers.filter(t => t !== ticker);
+      renderTickerTags();
+      if (currentTickers.length > 0) loadBrief();
+    }
+
+    function renderStats(briefs) {
+      const container = document.getElementById("statsRow");
+      const scores = briefs.map(b => b.executive_risk_score || 0);
+      const avg = scores.length ? Math.round(scores.reduce((a,b) => a+b, 0) / scores.length) : 0;
+      const highCount = briefs.filter(b => (b.executive_risk_score || 0) >= 45).length;
+      const elevatedSignals = briefs.filter(b => {
+        const l = (b.quiet_signal_level || "").toLowerCase();
+        return l === "elevated" || l === "watch";
+      }).length;
+      const avgLeadership = Math.round(
+        briefs.filter(b => b.leadership_signal_score != null)
+          .reduce((sum, b) => sum + b.leadership_signal_score, 0)
+        / (briefs.filter(b => b.leadership_signal_score != null).length || 1)
+      );
+
+      container.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Avg Executive Risk</div>
+          <div class="stat-value" style="color:${scoreColor(avg)}">${avg}</div>
+          <div class="stat-sub">across ${briefs.length} tickers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Elevated Risk</div>
+          <div class="stat-value" style="color:${highCount > 0 ? '#ffcc66' : '#49d17d'}">${highCount}</div>
+          <div class="stat-sub">score ≥ 45</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Quiet Signals</div>
+          <div class="stat-value" style="color:${elevatedSignals > 0 ? '#ffcc66' : '#49d17d'}">${elevatedSignals}</div>
+          <div class="stat-sub">elevated or watch</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Leadership Score</div>
+          <div class="stat-value" style="color:${scoreColor(100 - avgLeadership)}">${avgLeadership}</div>
+          <div class="stat-sub">leadership signal</div>
+        </div>
+      `;
+    }
+
+    function renderTopRisk(top) {
+      const banner = document.getElementById("topRiskBanner");
+      if (!top) { banner.style.display = "none"; return; }
+      banner.innerHTML = `
+        <div>
+          <div class="top-risk-label">⬛ Highest Executive Risk</div>
+          <p class="top-risk-ticker">${top.ticker}</p>
+          <p class="top-risk-interpretation">${top.executive_risk_interpretation || top.counseliq_interpretation || "No interpretation available."}</p>
+        </div>
+        <div class="top-risk-score-wrap">
+          <div class="top-risk-score">${top.executive_risk_score ?? "--"}</div>
+          <div class="top-risk-score-label">Executive Risk Score</div>
+          <div style="margin-top:8px;">
+            <span class="${levelPillClass(top.executive_risk_level)}">${top.executive_risk_level || "Unknown"}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRankTable(briefs) {
+      const tbody = document.getElementById("rankBody");
+      tbody.innerHTML = "";
+
+      briefs.forEach((brief, i) => {
+        const score = brief.executive_risk_score || 0;
+        const barColor = riskBarColor(score);
+
+        // Main rank row
+        const tr = document.createElement("tr");
+        tr.className = "rank-row";
+        tr.setAttribute("data-idx", i);
+        tr.onclick = () => toggleDetail(i);
+        tr.innerHTML = `
+          <td><div class="rank-num">${i + 1}</div></td>
+          <td><div class="rank-ticker">${brief.ticker}</div></td>
+          <td class="risk-bar-cell">
+            <div class="risk-bar-wrap">
+              <div class="risk-bar-bg">
+                <div class="risk-bar-fill" style="width:${score}%; background:${barColor};"></div>
+              </div>
+              <div class="risk-score-num" style="color:${barColor}">${score}</div>
+            </div>
+          </td>
+          <td><span class="${levelPillClass(brief.executive_risk_level)}">${brief.executive_risk_level || "—"}</span></td>
+          <td><span class="${quietPillClass(brief.quiet_signal_level)}">${brief.quiet_signal_level || "—"}</span></td>
+          <td style="font-size:14px; font-weight:bold;">${brief.leadership_signal_score ?? "—"}</td>
+          <td class="tone-cell">${brief.leadership_tone || "—"}</td>
+          <td><div class="expand-arrow" id="arrow-${i}">▾</div></td>
+        `;
+        tbody.appendChild(tr);
+
+        // Detail row
+        const detailTr = document.createElement("tr");
+        detailTr.className = "detail-row";
+        detailTr.id = `detail-${i}`;
+
+        const signals = brief.quiet_signals || [];
+        const drivers = brief.executive_risk_drivers || [];
+        const filingChanges = brief.filing_changes || [];
+        const instSignals = brief.institutional_positioning_signals || [];
+
+        detailTr.innerHTML = `
+          <td colspan="8">
+            <div class="detail-panel">
+              <div class="detail-grid">
+
+                <div class="detail-card">
+                  <div class="detail-card-label">Quiet Signals</div>
+                  <div class="detail-signals">
+                    ${signals.length === 0
+                      ? '<div style="font-size:13px;color:#8fa3bd;">No signals detected.</div>'
+                      : signals.map(s => `
+                          <div class="detail-signal-item">
+                            <div class="${dotClass(s.severity)}"></div>
+                            <div>
+                              <span style="font-weight:bold;font-size:13px;">${s.title}</span>
+                              <span style="font-size:12px;color:#8fa3bd;margin-left:6px;">${s.category || ""}</span>
+                              <div style="font-size:12px;color:#8fa3bd;margin-top:3px;">${s.explanation || ""}</div>
+                            </div>
+                          </div>
+                        `).join("")
+                    }
+                  </div>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-card-label">Risk Drivers</div>
+                  <div class="detail-card-body">
+                    ${drivers.length === 0
+                      ? '<span style="color:#8fa3bd;">No drivers flagged.</span>'
+                      : drivers.map(d => `<div style="margin-bottom:6px;">▸ ${d}</div>`).join("")
+                    }
+                  </div>
+                  ${filingChanges.length > 0 ? `
+                    <div class="detail-card-label" style="margin-top:12px;">Filing Changes</div>
+                    <ul class="detail-filing-changes">
+                      ${filingChanges.map(c => `<li>${c}</li>`).join("")}
+                    </ul>
+                  ` : ""}
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-card-label">Institutional Positioning</div>
+                  <div class="detail-card-body" style="margin-bottom:10px;">
+                    <span class="${levelPillClass(brief.institutional_positioning_level)}" style="font-size:12px;">
+                      ${brief.institutional_positioning_level || "Neutral"}
+                    </span>
+                  </div>
+                  <div class="detail-card-body" style="font-size:13px;color:#8fa3bd;margin-bottom:10px;">
+                    ${brief.institutional_positioning_interpretation || "No interpretation available."}
+                  </div>
+                  ${instSignals.length > 0 ? `
+                    <div class="institution-signals">
+                      ${instSignals.map(s => `<span class="inst-tag">${s}</span>`).join("")}
+                    </div>
+                  ` : ""}
+                </div>
+
+              </div>
+
+              <button class="view-full-btn" onclick="openFullBrief('${brief.ticker}')">
+                View full brief for ${brief.ticker} →
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(detailTr);
+      });
+    }
+
+    function toggleDetail(idx) {
+      const detail = document.getElementById(`detail-${idx}`);
+      const arrow = document.getElementById(`arrow-${idx}`);
+      const row = document.querySelector(`[data-idx="${idx}"]`);
+      const isOpen = detail.classList.contains("open");
+
+      document.querySelectorAll(".detail-row.open").forEach(el => el.classList.remove("open"));
+      document.querySelectorAll(".expand-arrow.open").forEach(el => el.classList.remove("open"));
+      document.querySelectorAll(".rank-row.expanded").forEach(el => el.classList.remove("expanded"));
+
+      if (!isOpen) {
+        detail.classList.add("open");
+        arrow.classList.add("open");
+        row.classList.add("expanded");
+      }
+    }
+
+    function openFullBrief(ticker) {
+      const input = document.createElement("input");
+      const url = `dashboard.html?ticker=${ticker}`;
+      window.location.href = url;
+    }
+
+    async function loadBrief() {
+      const status = document.getElementById("status");
+      const main = document.getElementById("main");
+      const btn = document.getElementById("refreshBtn");
+
+      status.textContent = "Loading intelligence brief for " + currentTickers.join(", ") + "...";
+      status.className = "status";
+      status.style.display = "block";
+      main.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Loading...";
+
+      renderTickerTags();
+
+      try {
+        const tickerParam = currentTickers.join(",");
+        const response = await fetch(`http://127.0.0.1:8000/market-brief?tickers=${tickerParam}`);
+
+        if (!response.ok) throw new Error("Backend returned status " + response.status);
+
+        const data = await response.json();
+        briefData = data;
+
+        const briefs = data.ranked_company_briefs || [];
+        const top = data.top_executive_risk;
+
+        document.getElementById("timestamp").textContent =
+          "Generated: " + (data.generated_at || new Date().toLocaleString());
+
+        renderStats(briefs);
+        renderTopRisk(top);
+        renderRankTable(briefs);
+
+        status.style.display = "none";
+        main.style.display = "block";
+
+      } catch (err) {
+        status.textContent =
+          "Could not load brief. Make sure the FastAPI backend is running at http://127.0.0.1:8000.";
+        status.className = "status error";
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Refresh Brief";
+      }
+    }
+
+    loadBrief();
+  </script>
+</body>
+</html>

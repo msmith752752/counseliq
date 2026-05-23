@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -36,8 +38,9 @@ def home():
 
 
 @app.get("/market-brief")
-def get_market_brief():
-    return generate_market_brief()
+def get_market_brief(tickers: Optional[str] = None):
+    ticker_list = [t.strip().upper() for t in tickers.split(",")] if tickers else None
+    return generate_market_brief(ticker_list)
 
 
 @app.get("/brief/{ticker}")
