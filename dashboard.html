@@ -36,6 +36,32 @@
       color: #8fa3bd;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-link {
+      color: #8fa3bd;
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 14px;
+      border: 1px solid #1e3148;
+      border-radius: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #e8eef7;
+      border-color: #27405d;
+    }
+
+    .nav-link.active {
+      color: #2d8cff;
+      border-color: #2d8cff;
+    }
+
     .search {
       display: flex;
       gap: 10px;
@@ -130,21 +156,10 @@
       margin-top: 10px;
     }
 
-    .positive {
-      color: #49d17d;
-    }
-
-    .warning {
-      color: #ffcc66;
-    }
-
-    .negative {
-      color: #ff6b6b;
-    }
-
-    .neutral {
-      color: #8fa3bd;
-    }
+    .positive { color: #49d17d; }
+    .warning  { color: #ffcc66; }
+    .negative { color: #ff6b6b; }
+    .neutral  { color: #8fa3bd; }
 
     .tone-badge {
       display: inline-block;
@@ -156,6 +171,78 @@
       margin-top: 8px;
     }
 
+    /* Executive Risk Banner */
+    .exec-risk-banner {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+      border-left: 3px solid #27405d;
+      padding-left: 20px;
+    }
+
+    .exec-risk-banner.severe   { border-left-color: #ff6b6b; }
+    .exec-risk-banner.elevated { border-left-color: #ffcc66; }
+    .exec-risk-banner.moderate { border-left-color: #2d8cff; }
+    .exec-risk-banner.watch    { border-left-color: #27405d; }
+    .exec-risk-banner.low      { border-left-color: #49d17d; }
+
+    .exec-risk-score-wrap { text-align: right; }
+
+    .exec-risk-score {
+      font-size: 56px;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .exec-risk-score-label {
+      font-size: 12px;
+      color: #8fa3bd;
+      margin-top: 4px;
+    }
+
+    .exec-risk-level-pill {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      border: 1px solid #27405d;
+      margin-top: 8px;
+    }
+
+    .pill-severe   { color: #ffb0b0; border-color: #ff6b6b; }
+    .pill-elevated { color: #ffe0a3; border-color: #ffcc66; }
+    .pill-moderate { color: #a3cfff; border-color: #2d8cff; }
+    .pill-watch    { color: #cbd7e6; border-color: #27405d; }
+    .pill-low      { color: #a8efc0; border-color: #49d17d; }
+
+    .exec-risk-section-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8fa3bd;
+      margin-bottom: 8px;
+    }
+
+    .exec-risk-interpretation {
+      font-size: 14px;
+      color: #cbd7e6;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .exec-risk-drivers {
+      margin-top: 10px;
+      padding-left: 16px;
+      color: #8fa3bd;
+      font-size: 13px;
+    }
+
+    .exec-risk-drivers li { margin-bottom: 4px; }
+
+    /* Quiet signals */
     .quiet-header {
       display: flex;
       justify-content: space-between;
@@ -214,20 +301,9 @@
       color: #cbd7e6;
     }
 
-    .severity-high {
-      color: #ffb0b0;
-      border-color: #ff6b6b;
-    }
-
-    .severity-medium {
-      color: #ffe0a3;
-      border-color: #ffcc66;
-    }
-
-    .severity-low {
-      color: #a8efc0;
-      border-color: #49d17d;
-    }
+    .severity-high   { color: #ffb0b0; border-color: #ff6b6b; }
+    .severity-medium { color: #ffe0a3; border-color: #ffcc66; }
+    .severity-low    { color: #a8efc0; border-color: #49d17d; }
 
     .category-pill {
       display: inline-block;
@@ -254,15 +330,8 @@
       font-size: 13px;
     }
 
-    .tag-risk {
-      border-color: #ff6b6b;
-      color: #ffb0b0;
-    }
-
-    .tag-capital {
-      border-color: #49d17d;
-      color: #a8efc0;
-    }
+    .tag-risk    { border-color: #ff6b6b; color: #ffb0b0; }
+    .tag-capital { border-color: #49d17d; color: #a8efc0; }
 
     table {
       width: 100%;
@@ -282,19 +351,9 @@
       font-weight: normal;
     }
 
-    .muted {
-      color: #8fa3bd;
-    }
-
-    .loading {
-      color: #8fa3bd;
-      margin-top: 20px;
-    }
-
-    .error {
-      color: #ff6b6b;
-      margin-top: 20px;
-    }
+    .muted  { color: #8fa3bd; }
+    .loading { color: #8fa3bd; margin-top: 20px; }
+    .error   { color: #ff6b6b; margin-top: 20px; }
 
     pre {
       white-space: pre-wrap;
@@ -307,9 +366,7 @@
       overflow: auto;
     }
 
-    a {
-      color: #6eb6ff;
-    }
+    a { color: #6eb6ff; }
 
     ul {
       margin-top: 8px;
@@ -317,41 +374,17 @@
       color: #cbd7e6;
     }
 
-    li {
-      margin-bottom: 8px;
-    }
+    li { margin-bottom: 8px; }
 
     @media (max-width: 850px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .score,
-      .label {
-        text-align: left;
-      }
-
-      .half,
-      .third,
-      .quarter {
-        grid-column: span 12;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
-
-      .quiet-header,
-      .quiet-signal-top {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .quiet-meta {
-        justify-content: flex-start;
-      }
+      .hero { grid-template-columns: 1fr; }
+      .score, .label { text-align: left; }
+      .half, .third, .quarter { grid-column: span 12; }
+      .header { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .quiet-header, .quiet-signal-top { flex-direction: column; align-items: flex-start; }
+      .quiet-meta { justify-content: flex-start; }
+      .exec-risk-banner { grid-template-columns: 1fr; }
+      .exec-risk-score-wrap { text-align: left; }
     }
   </style>
 </head>
@@ -364,15 +397,21 @@
         <p>Corporate behavioral intelligence from SEC filings</p>
       </div>
 
-      <div class="search">
-        <input id="tickerInput" value="AAPL" />
-        <button onclick="loadBrief()">Analyze</button>
+      <div class="header-right">
+        <a href="market_brief.html" class="nav-link">Market Brief</a>
+        <a href="dashboard.html" class="nav-link active">Single Ticker</a>
+        <div class="search">
+          <input id="tickerInput" value="AAPL" />
+          <button onclick="loadBrief()">Analyze</button>
+        </div>
       </div>
     </div>
 
     <div id="status" class="loading">Enter a ticker and click Analyze.</div>
 
     <div id="dashboard" class="grid" style="display: none;">
+
+      <!-- Hero -->
       <div class="card hero">
         <div>
           <p class="ticker" id="ticker">--</p>
@@ -385,25 +424,40 @@
         </div>
       </div>
 
+      <!-- Executive Risk Banner -->
+      <div class="card exec-risk-banner" id="execRiskBanner">
+        <div>
+          <div class="exec-risk-section-label">Executive Risk Intelligence</div>
+          <p class="exec-risk-interpretation" id="execRiskInterpretation">Loading...</p>
+          <ul class="exec-risk-drivers" id="execRiskDrivers"></ul>
+        </div>
+        <div class="exec-risk-score-wrap">
+          <div class="exec-risk-score" id="execRiskScore">--</div>
+          <div class="exec-risk-score-label">Executive Risk Score</div>
+          <div><span class="exec-risk-level-pill" id="execRiskLevelPill">--</span></div>
+        </div>
+      </div>
+
+      <!-- Quiet Signals -->
       <div class="card full">
         <div class="quiet-header">
           <div>
             <h2>Quiet Signals Engine</h2>
-            <p class="muted" id="quietSignalSummary">
-              Behind-the-scenes corporate behavior signals loading...
-            </p>
+            <p class="muted" id="quietSignalSummary">Behind-the-scenes corporate behavior signals loading...</p>
           </div>
           <div class="quiet-level" id="quietSignalLevel">Level: --</div>
         </div>
         <div id="quietSignals"></div>
       </div>
 
+      <!-- Filing Comparison -->
       <div class="card full">
         <h2>Filing Comparison Intelligence</h2>
         <p class="muted" id="comparisonSummary"></p>
         <div class="tone-badge" id="toneShift">Tone Shift: --</div>
       </div>
 
+      <!-- Delta metrics -->
       <div class="card quarter">
         <h2>Risk Language</h2>
         <div class="metric" id="riskDelta">--</div>
@@ -508,6 +562,7 @@
         <h2>CounselIQ Interpretation</h2>
         <p id="interpretation"></p>
       </div>
+
     </div>
   </div>
 
@@ -520,13 +575,11 @@
 
     function deltaClass(value, riskDirection = false) {
       if (value === undefined || value === null) return "metric neutral";
-
       if (riskDirection) {
         if (value > 0) return "metric negative";
         if (value < 0) return "metric positive";
         return "metric neutral";
       }
-
       if (value > 0) return "metric positive";
       if (value < 0) return "metric negative";
       return "metric neutral";
@@ -534,32 +587,42 @@
 
     function toneClass(tone) {
       const lower = (tone || "").toLowerCase();
-
       if (lower.includes("defensive")) return "tone-badge negative";
       if (lower.includes("confident")) return "tone-badge positive";
-      if (lower.includes("mixed")) return "tone-badge warning";
-
+      if (lower.includes("mixed"))     return "tone-badge warning";
       return "tone-badge neutral";
     }
 
     function quietLevelClass(level) {
       const lower = (level || "").toLowerCase();
-
       if (lower.includes("elevated")) return "quiet-level negative";
-      if (lower.includes("watch")) return "quiet-level warning";
-      if (lower.includes("calm")) return "quiet-level positive";
-
+      if (lower.includes("watch"))    return "quiet-level warning";
+      if (lower.includes("calm"))     return "quiet-level positive";
       return "quiet-level neutral";
     }
 
     function severityClass(severity) {
       const lower = (severity || "").toLowerCase();
-
-      if (lower === "high") return "severity severity-high";
+      if (lower === "high")   return "severity severity-high";
       if (lower === "medium") return "severity severity-medium";
-      if (lower === "low") return "severity severity-low";
-
+      if (lower === "low")    return "severity severity-low";
       return "severity";
+    }
+
+    function execRiskColor(score) {
+      if (score >= 65) return "#ff6b6b";
+      if (score >= 45) return "#ffcc66";
+      if (score >= 25) return "#2d8cff";
+      return "#49d17d";
+    }
+
+    function execRiskPillClass(level) {
+      const l = (level || "").toLowerCase();
+      if (l === "severe")   return "exec-risk-level-pill pill-severe";
+      if (l === "elevated") return "exec-risk-level-pill pill-elevated";
+      if (l === "moderate") return "exec-risk-level-pill pill-moderate";
+      if (l === "watch")    return "exec-risk-level-pill pill-watch";
+      return "exec-risk-level-pill pill-low";
     }
 
     async function loadBrief() {
@@ -573,6 +636,11 @@
         dashboard.style.display = "none";
         return;
       }
+
+      // Update URL so a refresh or share keeps the ticker
+      const url = new URL(window.location);
+      url.searchParams.set("ticker", ticker);
+      window.history.replaceState({}, "", url);
 
       status.innerHTML = "Loading CounselIQ intelligence for " + ticker + "...";
       status.className = "loading";
@@ -601,6 +669,32 @@
         document.getElementById("insiderActivity").innerText = data.insider_activity || "No insider activity available.";
         document.getElementById("interpretation").innerText = data.counseliq_interpretation || "";
 
+        // Executive Risk
+        const execScore = data.executive_risk_score ?? null;
+        const execLevel = data.executive_risk_level || "Unknown";
+        const execDrivers = data.executive_risk_drivers || [];
+
+        const banner = document.getElementById("execRiskBanner");
+        banner.className = "card exec-risk-banner " + execLevel.toLowerCase();
+
+        const scoreEl = document.getElementById("execRiskScore");
+        scoreEl.innerText = execScore ?? "--";
+        scoreEl.style.color = execScore !== null ? execRiskColor(execScore) : "#8fa3bd";
+
+        document.getElementById("execRiskLevelPill").innerText = execLevel;
+        document.getElementById("execRiskLevelPill").className = execRiskPillClass(execLevel);
+        document.getElementById("execRiskInterpretation").innerText =
+          data.executive_risk_interpretation || "No interpretation available.";
+
+        const driversList = document.getElementById("execRiskDrivers");
+        driversList.innerHTML = "";
+        execDrivers.forEach(d => {
+          const li = document.createElement("li");
+          li.innerText = d;
+          driversList.appendChild(li);
+        });
+
+        // Quiet signals
         document.getElementById("quietSignalSummary").innerText =
           data.quiet_signal_summary || "No quiet signal summary available.";
 
@@ -615,7 +709,6 @@
           data.quiet_signals.forEach(signal => {
             const div = document.createElement("div");
             div.className = "quiet-signal";
-
             div.innerHTML = `
               <div class="quiet-signal-top">
                 <div class="quiet-title">${signal.title || "Untitled Signal"}</div>
@@ -627,13 +720,13 @@
               <p class="muted">${signal.explanation || ""}</p>
               <p class="readthrough">${signal.investment_readthrough || ""}</p>
             `;
-
             quietSignals.appendChild(div);
           });
         } else {
           quietSignals.innerHTML = "<p class='muted'>No quiet signals detected.</p>";
         }
 
+        // Filing comparison
         document.getElementById("comparisonSummary").innerText =
           comparison.summary || "No filing comparison available.";
 
@@ -641,10 +734,10 @@
         toneShift.innerText = "Tone Shift: " + (comparison.tone_shift || "Unavailable");
         toneShift.className = toneClass(comparison.tone_shift);
 
-        const riskDelta = comparison.risk_language_delta;
+        const riskDelta       = comparison.risk_language_delta;
         const confidenceDelta = comparison.confidence_language_delta;
-        const liquidityDelta = comparison.liquidity_debt_language_delta;
-        const capitalDelta = comparison.capital_allocation_language_delta;
+        const liquidityDelta  = comparison.liquidity_debt_language_delta;
+        const capitalDelta    = comparison.capital_allocation_language_delta;
 
         document.getElementById("riskDelta").innerText = formatDelta(riskDelta);
         document.getElementById("riskDelta").className = deltaClass(riskDelta, true);
@@ -702,8 +795,7 @@
 
         const comparisonTable = document.getElementById("comparisonTable");
         comparisonTable.innerHTML = "";
-
-        const current = data.selected_filing;
+        const current  = data.selected_filing;
         const previous = data.previous_comparable_filing;
 
         if (current) {
@@ -731,11 +823,7 @@
         }
 
         if (!current && !previous) {
-          comparisonTable.innerHTML = `
-            <tr>
-              <td colspan="5" class="muted">No comparable filing pair available.</td>
-            </tr>
-          `;
+          comparisonTable.innerHTML = `<tr><td colspan="5" class="muted">No comparable filing pair available.</td></tr>`;
         }
 
         const filingsTable = document.getElementById("filingsTable");
@@ -767,7 +855,15 @@
       }
     }
 
-    loadBrief();
+    // On page load: read ?ticker= param from URL, set input, and auto-load
+    (function init() {
+      const params = new URLSearchParams(window.location.search);
+      const tickerParam = params.get("ticker");
+      if (tickerParam) {
+        document.getElementById("tickerInput").value = tickerParam.toUpperCase();
+      }
+      loadBrief();
+    })();
   </script>
 </body>
 </html>

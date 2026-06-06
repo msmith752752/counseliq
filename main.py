@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sec_engine import get_sec_filing_summary
 from ai_engine import generate_executive_brief
 from quiet_signals_engine import build_quiet_signals
+from executive_risk_engine import calculate_executive_risk_score
 from market_brief_engine import generate_market_brief
 
 app = FastAPI(
@@ -55,6 +56,14 @@ def get_company_brief(ticker: str):
     # Generate behind-the-scenes quiet signal intelligence
     quiet_signal_data = build_quiet_signals(ticker, sec_data, ai_brief)
 
+    # Generate executive risk score
+    executive_risk = calculate_executive_risk_score(
+        ticker,
+        sec_data,
+        ai_brief,
+        quiet_signal_data,
+    )
+
     return {
         "ticker": ticker.upper(),
 
@@ -73,6 +82,12 @@ def get_company_brief(ticker: str):
         "quiet_signal_level": quiet_signal_data["quiet_signal_level"],
         "quiet_signal_summary": quiet_signal_data["quiet_signal_summary"],
         "quiet_signals": quiet_signal_data["quiet_signals"],
+
+        # Executive Risk Engine
+        "executive_risk_score": executive_risk["executive_risk_score"],
+        "executive_risk_level": executive_risk["executive_risk_level"],
+        "executive_risk_drivers": executive_risk["executive_risk_drivers"],
+        "executive_risk_interpretation": executive_risk["executive_risk_interpretation"],
 
         # SEC filing intelligence
         "sec_summary": sec_data["filing_summary"],
