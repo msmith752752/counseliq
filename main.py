@@ -10,6 +10,7 @@ from quiet_signals_engine import build_quiet_signals
 from executive_risk_engine import calculate_executive_risk_score
 from market_brief_engine import generate_market_brief
 from stock_analysis_engine import build_stock_analysis
+from options_signals_engine import build_options_signals
 
 app = FastAPI(
     title="CounselIQ API",
@@ -123,3 +124,8 @@ def get_company_brief(ticker: str):
 @app.get("/stock/{ticker}")
 def get_stock_analysis(ticker: str):
     return build_stock_analysis(ticker)
+
+
+@app.get("/options/{ticker}")
+def get_options_signals(ticker: str):
+    return build_options_signals(ticker)

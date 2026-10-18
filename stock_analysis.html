@@ -370,6 +370,14 @@
     </div>
   </div>
 
+  <!-- ROW OPTIONS: Options Intelligence -->
+  <div id="rowOptions" style="display:none;">
+    <div class="card" style="grid-column:1/-1;">
+      <div class="card-title">Options Intelligence</div>
+      <div id="optionsContent"></div>
+    </div>
+  </div>
+
   <!-- ROW 5: News -->
   <div id="row5" style="display:none;">
     <div class="card">
@@ -414,7 +422,7 @@
   function hide(id) { document.getElementById(id).style.display = 'none'; }
 
   function resetUI() {
-    ['signalBanner','row1','row2','row3','row4','row5'].forEach(id => hide(id));
+    ['signalBanner','row1','row2','row3','row4','rowOptions','row5'].forEach(id => hide(id));
     ['row1','row2','row3'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
@@ -433,8 +441,12 @@
     loadEl.classList.add('visible');
 
     try {
-      const res = await fetch(`${BASE}/stock/${ticker}`);
+      const [res, optRes] = await Promise.all([
+        fetch(`${BASE}/stock/${ticker}`),
+        fetch(`${BASE}/options/${ticker}`)
+      ]);
       const d = await res.json();
+      const opt = await optRes.json();
       loadEl.classList.remove('visible');
 
       if (d.status === 'error') {
@@ -628,6 +640,91 @@
     if (d.generated_at) {
       document.getElementById('generatedAt').textContent = `Generated: ${d.generated_at}`;
     }
+
+    // ---- OPTIONS INTELLIGENCE ----
+    renderOptions(opt);
+  }
+
+  function renderOptions(opt) {
+    if (!opt || opt.error) {
+      const el = document.getElementById('optionsContent');
+      if (el) el.innerHTML = `<div style="color:#888;font-size:13px;">${opt?.error || 'No options data available.'}</div>`;
+      document.getElementById('rowOptions').style.display = 'block';
+      return;
+    }
+
+    const s = opt.summary || {};
+    const level = opt.options_signal_level || 'Neutral';
+    const levelColor = level === 'Elevated' ? '#ef5350' : level === 'Watch' ? '#ffb74d' : level === 'Positive' ? '#66bb6a' : '#90a4ae';
+
+    // Signal badges
+    const sigHtml = (opt.options_signals || []).map(sig => {
+      const c = sig.severity === 'watch' ? '#ffb74d' : sig.severity === 'positive' ? '#66bb6a' : '#90a4ae';
+      return `<div style="border-left:3px solid ${c};padding:8px 12px;margin-bottom:8px;background:rgba(255,255,255,0.03);border-radius:0 4px 4px 0;">
+        <div style="font-size:12px;font-weight:600;color:${c};text-transform:uppercase;letter-spacing:1px;">${sig.signal}</div>
+        <div style="font-size:13px;color:#b0bec5;margin-top:2px;">${sig.detail}</div>
+      </div>`;
+    }).join('');
+
+    // Top unusual contracts table
+    const contracts = opt.top_unusual_calls || [];
+    const contractRows = contracts.map(c => `
+      <tr>
+        <td>$${c.strike}</td>
+        <td>${c.expiration}</td>
+        <td>${c.moneyness}</td>
+        <td>${c.volume.toLocaleString()}</td>
+        <td>${c.open_interest.toLocaleString()}</td>
+        <td style="color:#ffb74d;font-weight:600;">${c.vol_oi_ratio}×</td>
+        <td>${c.implied_volatility}</td>
+        <td>$${c.last_price}</td>
+      </tr>`).join('');
+
+    const contractTable = contracts.length > 0 ? `
+      <div style="margin-top:16px;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:#4fc3f7;text-transform:uppercase;margin-bottom:8px;">Top Unusual Call Contracts</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="color:#546e7a;font-size:11px;text-transform:uppercase;letter-spacing:1px;">
+                <th style="text-align:left;padding:6px 8px;">Strike</th>
+                <th style="text-align:left;padding:6px 8px;">Expiry</th>
+                <th style="text-align:left;padding:6px 8px;">Moneyness</th>
+                <th style="text-align:right;padding:6px 8px;">Volume</th>
+                <th style="text-align:right;padding:6px 8px;">OI</th>
+                <th style="text-align:right;padding:6px 8px;">Vol/OI</th>
+                <th style="text-align:right;padding:6px 8px;">IV</th>
+                <th style="text-align:right;padding:6px 8px;">Last</th>
+              </tr>
+            </thead>
+            <tbody style="color:#cfd8dc;">
+              ${contractRows}
+            </tbody>
+          </table>
+        </div>
+      </div>` : '';
+
+    document.getElementById('optionsContent').innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:${levelColor};text-transform:uppercase;border:1px solid ${levelColor};padding:4px 10px;border-radius:4px;">${level}</div>
+        <div style="font-size:13px;color:#90a4ae;">Expirations analyzed: ${(opt.expirations_analyzed || []).join(' · ') || 'N/A'}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;">
+        <div class="stat-item"><div class="stat-label">Call Volume</div><div class="stat-value">${(s.total_call_volume||0).toLocaleString()}</div></div>
+        <div class="stat-item"><div class="stat-label">Put Volume</div><div class="stat-value">${(s.total_put_volume||0).toLocaleString()}</div></div>
+        <div class="stat-item"><div class="stat-label">Call %</div><div class="stat-value" style="color:#66bb6a;">${s.call_pct}%</div></div>
+        <div class="stat-item"><div class="stat-label">Put %</div><div class="stat-value" style="color:#ef5350;">${s.put_pct}%</div></div>
+        <div class="stat-item"><div class="stat-label">P/C Ratio</div><div class="stat-value">${s.put_call_ratio ?? 'N/A'}</div></div>
+        <div class="stat-item"><div class="stat-label">Avg Call IV</div><div class="stat-value">${s.avg_call_iv}</div></div>
+        <div class="stat-item"><div class="stat-label">Avg Put IV</div><div class="stat-value">${s.avg_put_iv}</div></div>
+        <div class="stat-item"><div class="stat-label">IV Skew</div><div class="stat-value" style="font-size:11px;">${s.iv_skew}</div></div>
+      </div>
+
+      ${sigHtml || '<div style="color:#546e7a;font-size:13px;">No unusual signals detected.</div>'}
+      ${contractTable}
+    `;
+    document.getElementById('rowOptions').style.display = 'block';
   }
 
   document.getElementById('tickerInput').addEventListener('keydown', e => {
