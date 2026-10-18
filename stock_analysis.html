@@ -203,6 +203,24 @@
       border-bottom: 1px solid #1e3a5f;
       padding-bottom: 8px;
     }
+    .stat-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #1e3a5f;
+      padding: 10px 12px;
+      border-radius: 4px;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: #546e7a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e0f0ff;
+    }
 
     /* DATA ROWS */
     .data-row {
@@ -639,7 +657,8 @@
     }
 
     // ---- OPTIONS INTELLIGENCE (fetched independently) ----
-    fetch(`${BASE}/options/${ticker}`)
+    const optTicker = d.ticker || document.getElementById('tickerInput').value.trim().toUpperCase();
+    fetch(`${BASE}/options/${optTicker}`)
       .then(r => r.json())
       .then(opt => renderOptions(opt))
       .catch(() => renderOptions({ error: 'Could not load options data.' }));
