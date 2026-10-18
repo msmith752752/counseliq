@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from sec_engine import get_sec_filing_summary
 from ai_engine import generate_executive_brief
@@ -15,6 +16,9 @@ app = FastAPI(
     description="Executive intelligence platform for SEC filings, leadership signals, and corporate strategy.",
     version="0.5.0",
 )
+
+# Serve HTML files
+app.mount("/ui", StaticFiles(directory=".", html=True), name="ui")
 
 # Allow local dashboard access
 app.add_middleware(
