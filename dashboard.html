@@ -398,8 +398,9 @@
       </div>
 
       <div class="header-right">
-        <a href="market_brief.html" class="nav-link">Market Brief</a>
-        <a href="dashboard.html" class="nav-link active">Single Ticker</a>
+        <a href="/ui/market_brief.html" class="nav-link">Market Brief</a>
+        <a href="/ui/dashboard.html" class="nav-link active">Single Ticker</a>
+        <a href="/ui/stock_analysis.html" class="nav-link">Stock Analysis</a>
         <div class="search">
           <input id="tickerInput" value="AAPL" />
           <button onclick="loadBrief()">Analyze</button>
@@ -647,7 +648,7 @@
       dashboard.style.display = "none";
 
       try {
-        const response = await fetch(`http://127.0.0.1:8000/brief/${ticker}`);
+        const response = await fetch(`http://54.147.143.148:8010/brief/${ticker}`);
 
         if (!response.ok) {
           throw new Error("Backend returned status " + response.status);
@@ -848,7 +849,7 @@
         dashboard.style.display = "grid";
 
       } catch (error) {
-        status.innerHTML = "Could not load CounselIQ data. Make sure the FastAPI backend is running at http://127.0.0.1:8000.";
+        status.innerHTML = "Could not load CounselIQ data. Make sure the FastAPI backend is running at http://54.147.143.148:8010.";
         status.className = "error";
         dashboard.style.display = "none";
         console.error(error);

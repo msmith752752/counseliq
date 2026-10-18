@@ -549,8 +549,9 @@
         <p>Corporate behavioral intelligence from SEC filings</p>
       </div>
       <div class="header-right">
-        <a href="dashboard.html" class="nav-link">Single Ticker</a>
-        <a href="market_brief.html" class="nav-link active">Market Brief</a>
+        <a href="/ui/dashboard.html" class="nav-link">Single Ticker</a>
+        <a href="/ui/market_brief.html" class="nav-link active">Market Brief</a>
+        <a href="/ui/stock_analysis.html" class="nav-link">Stock Analysis</a>
         <button class="refresh-btn" id="refreshBtn" onclick="loadBrief()">Refresh Brief</button>
       </div>
     </div>
@@ -866,7 +867,7 @@
 
     function openFullBrief(ticker) {
       const input = document.createElement("input");
-      const url = `dashboard.html?ticker=${ticker}`;
+      const url = `/ui/dashboard.html?ticker=${ticker}`;
       window.location.href = url;
     }
 
@@ -886,7 +887,7 @@
 
       try {
         const tickerParam = currentTickers.join(",");
-        const response = await fetch(`http://127.0.0.1:8000/market-brief?tickers=${tickerParam}`);
+        const response = await fetch(`http://54.147.143.148:8010/market-brief?tickers=${tickerParam}`);
 
         if (!response.ok) throw new Error("Backend returned status " + response.status);
 
@@ -908,7 +909,7 @@
 
       } catch (err) {
         status.textContent =
-          "Could not load brief. Make sure the FastAPI backend is running at http://127.0.0.1:8000.";
+          "Could not load brief. Make sure the FastAPI backend is running at http://54.147.143.148:8010.";
         status.className = "status error";
         console.error(err);
       } finally {
