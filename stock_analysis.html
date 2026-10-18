@@ -441,12 +441,9 @@
     loadEl.classList.add('visible');
 
     try {
-      const [res, optRes] = await Promise.all([
-        fetch(`${BASE}/stock/${ticker}`),
-        fetch(`${BASE}/options/${ticker}`)
-      ]);
+      // Fetch stock data first, then options independently so one can't block the other
+      const res = await fetch(`${BASE}/stock/${ticker}`);
       const d = await res.json();
-      const opt = await optRes.json();
       loadEl.classList.remove('visible');
 
       if (d.status === 'error') {
@@ -641,8 +638,11 @@
       document.getElementById('generatedAt').textContent = `Generated: ${d.generated_at}`;
     }
 
-    // ---- OPTIONS INTELLIGENCE ----
-    renderOptions(opt);
+    // ---- OPTIONS INTELLIGENCE (fetched independently) ----
+    fetch(`${BASE}/options/${ticker}`)
+      .then(r => r.json())
+      .then(opt => renderOptions(opt))
+      .catch(() => renderOptions({ error: 'Could not load options data.' }));
   }
 
   function renderOptions(opt) {
