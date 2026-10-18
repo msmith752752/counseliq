@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CounselIQ — Stock Analysis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #07111f;
+      color: #c8d6e5;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: #0b1a2e;
+      border-bottom: 1px solid #1e3a5f;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-brand {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4fc3f7;
+      letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a {
+      color: #7a9bb8;
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #4fc3f7; }
+
+    /* HEADER */
+    .header {
+      background: #0b1a2e;
+      border-bottom: 1px solid #1e3a5f;
+      padding: 24px 28px 20px;
+    }
+    .header h1 {
+      font-size: 20px;
+      color: #e0f0ff;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .header p {
+      color: #7a9bb8;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    /* SEARCH */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .search-bar input {
+      background: #07111f;
+      border: 1px solid #1e3a5f;
+      color: #e0f0ff;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      width: 180px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      outline: none;
+    }
+    .search-bar input:focus { border-color: #4fc3f7; }
+    .search-bar button {
+      background: #1a3a5c;
+      border: 1px solid #2a5a8c;
+      color: #4fc3f7;
+      padding: 10px 22px;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+    .search-bar button:hover { background: #1e4a72; }
+
+    /* MAIN */
+    .main { padding: 24px 28px; max-width: 1200px; }
+
+    /* SIGNAL BANNER */
+    .signal-banner {
+      border: 1px solid;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .signal-banner.elevated { border-color: #e53935; background: #1a0a0a; }
+    .signal-banner.watch    { border-color: #f9a825; background: #1a140a; }
+    .signal-banner.positive { border-color: #2e7d32; background: #0a1a0a; }
+    .signal-banner.neutral  { border-color: #1e3a5f; background: #0b1a2e; }
+
+    .banner-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .banner-ticker {
+      font-size: 22px;
+      font-weight: bold;
+      color: #e0f0ff;
+      letter-spacing: 2px;
+    }
+    .banner-name { color: #7a9bb8; font-size: 13px; }
+    .signal-pill {
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .pill-elevated { background: #e53935; color: #fff; }
+    .pill-watch    { background: #f9a825; color: #111; }
+    .pill-positive { background: #2e7d32; color: #fff; }
+    .pill-neutral  { background: #1e3a5f; color: #aaa; }
+
+    .banner-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .banner-price {
+      font-size: 28px;
+      font-weight: bold;
+      color: #e0f0ff;
+    }
+    .price-change.up   { color: #4caf50; font-size: 15px; }
+    .price-change.down { color: #f44336; font-size: 15px; }
+    .price-change.flat { color: #7a9bb8; font-size: 15px; }
+
+    .banner-meta {
+      color: #7a9bb8;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    /* SIGNAL LIST */
+    .signal-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .signal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid;
+    }
+    .signal-item.Watch    { border-color: #f9a825; }
+    .signal-item.Positive { border-color: #4caf50; }
+    .signal-item.Note     { border-color: #4fc3f7; }
+    .signal-item.Neutral  { border-color: #1e3a5f; }
+    .signal-label { color: #e0f0ff; font-size: 13px; flex: 1; }
+    .signal-detail { color: #7a9bb8; font-size: 12px; margin-top: 2px; }
+
+    /* GRID LAYOUT */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* CARDS */
+    .card {
+      background: #0b1a2e;
+      border: 1px solid #1e3a5f;
+      padding: 18px 20px;
+    }
+    .card-title {
+      font-size: 11px;
+      color: #4fc3f7;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #1e3a5f;
+      padding-bottom: 8px;
+    }
+
+    /* DATA ROWS */
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 5px 0;
+      border-bottom: 1px solid #0f2035;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .data-label { color: #7a9bb8; font-size: 12px; flex: 1; }
+    .data-val {
+      color: #e0f0ff;
+      font-size: 13px;
+      text-align: right;
+      font-weight: bold;
+    }
+    .data-val.na { color: #3a5a7a; }
+    .data-val.up { color: #4caf50; }
+    .data-val.down { color: #f44336; }
+
+    /* SUMMARY TEXT */
+    .summary-text {
+      color: #a0b8cc;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    /* NEWS */
+    .news-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #0f2035;
+    }
+    .news-item:last-child { border-bottom: none; }
+    .news-title a {
+      color: #c8d6e5;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .news-title a:hover { color: #4fc3f7; }
+    .news-meta {
+      color: #3a5a7a;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+    .news-summary {
+      color: #7a9bb8;
+      font-size: 11px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* LOADING / ERROR */
+    .status-block {
+      padding: 32px;
+      text-align: center;
+      color: #3a5a7a;
+      display: none;
+    }
+    .status-block.visible { display: block; }
+    .status-block.error { color: #e53935; }
+
+    /* PLACEHOLDER */
+    #placeholder {
+      padding: 48px 0;
+      color: #3a5a7a;
+      font-size: 13px;
+    }
+
+    /* GENERATED AT */
+    .generated-at {
+      color: #2a4a6a;
+      font-size: 11px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">COUNSEL<span style="color:#e0f0ff">IQ</span></div>
+  <div class="nav-links">
+    <a href="dashboard.html">Single Ticker</a>
+    <a href="market_brief.html">Market Brief</a>
+    <a href="stock_analysis.html" class="active">Stock Analysis</a>
+  </div>
+</nav>
+
+<div class="header">
+  <h1>STOCK ANALYSIS</h1>
+  <p>Market data, financials, analyst intelligence, and CounselIQ signals.</p>
+  <div class="search-bar">
+    <input type="text" id="tickerInput" placeholder="TICKER" maxlength="10" />
+    <button onclick="loadStock()">ANALYZE</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="loading" class="status-block">Loading market data...</div>
+  <div id="error" class="status-block error"></div>
+  <div id="placeholder">Enter a ticker symbol above to begin analysis.</div>
+
+  <!-- SIGNAL BANNER -->
+  <div id="signalBanner" class="signal-banner">
+    <div class="banner-top">
+      <span id="bannerTicker" class="banner-ticker"></span>
+      <span id="bannerName" class="banner-name"></span>
+      <span id="signalPill" class="signal-pill"></span>
+    </div>
+    <div class="banner-price-row">
+      <span id="bannerPrice" class="banner-price"></span>
+      <span id="bannerChange" class="price-change"></span>
+    </div>
+    <div id="bannerMeta" class="banner-meta"></div>
+    <div id="signalList" class="signal-list"></div>
+  </div>
+
+  <!-- ROW 1: Profile + Price -->
+  <div class="grid-2" id="row1" style="display:none;">
+    <div class="card">
+      <div class="card-title">Company Profile</div>
+      <div id="profileContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Price & Market Data</div>
+      <div id="priceContent"></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Valuation + Earnings + Balance Sheet -->
+  <div class="grid-3" id="row2" style="display:none;">
+    <div class="card">
+      <div class="card-title">Valuation</div>
+      <div id="valuationContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Earnings & Revenue</div>
+      <div id="earningsContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Balance Sheet</div>
+      <div id="balanceContent"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Analyst + Dividend -->
+  <div class="grid-2" id="row3" style="display:none;">
+    <div class="card">
+      <div class="card-title">Analyst Intelligence</div>
+      <div id="analystContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Dividend</div>
+      <div id="dividendContent"></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Business Summary -->
+  <div id="row4" style="display:none;">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Business Overview</div>
+      <div id="summaryContent" class="summary-text"></div>
+    </div>
+  </div>
+
+  <!-- ROW 5: News -->
+  <div id="row5" style="display:none;">
+    <div class="card">
+      <div class="card-title">Latest News</div>
+      <div id="newsContent"></div>
+    </div>
+  </div>
+
+  <div id="generatedAt" class="generated-at"></div>
+
+</div>
+
+<script>
+  const BASE = 'http://54.147.143.148:8010';
+
+  function fmt(val, prefix='', suffix='', decimals=2, fallback='N/A') {
+    if (val === null || val === undefined) return fallback;
+    const n = parseFloat(val);
+    if (isNaN(n)) return fallback;
+    return prefix + n.toFixed(decimals) + suffix;
+  }
+
+  function fmtPct(val, fallback='N/A') {
+    if (val === null || val === undefined) return fallback;
+    const n = parseFloat(val);
+    if (isNaN(n)) return fallback;
+    return (n * 100).toFixed(1) + '%';
+  }
+
+  function fmtNum(val, fallback='N/A') {
+    if (val === null || val === undefined) return fallback;
+    return Number(val).toLocaleString();
+  }
+
+  function row(label, val, cls='') {
+    const v = (val === null || val === undefined || val === '') ? '<span class="data-val na">—</span>'
+              : `<span class="data-val ${cls}">${val}</span>`;
+    return `<div class="data-row"><span class="data-label">${label}</span>${v}</div>`;
+  }
+
+  function show(id) { document.getElementById(id).style.display = ''; }
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+  function resetUI() {
+    ['signalBanner','row1','row2','row3','row4','row5'].forEach(id => hide(id));
+    ['row1','row2','row3'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById('generatedAt').textContent = '';
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('error').textContent = '';
+    document.getElementById('error').classList.remove('visible');
+  }
+
+  async function loadStock() {
+    const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+    if (!ticker) return;
+
+    resetUI();
+    const loadEl = document.getElementById('loading');
+    loadEl.classList.add('visible');
+
+    try {
+      const res = await fetch(`${BASE}/stock/${ticker}`);
+      const d = await res.json();
+      loadEl.classList.remove('visible');
+
+      if (d.status === 'error') {
+        const errEl = document.getElementById('error');
+        errEl.textContent = d.error || 'Unknown error retrieving data.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      renderStock(d);
+    } catch(e) {
+      loadEl.classList.remove('visible');
+      const errEl = document.getElementById('error');
+      errEl.textContent = 'Failed to connect to CounselIQ backend. Is the server running?';
+      errEl.classList.add('visible');
+    }
+  }
+
+  function renderStock(d) {
+    // ---- SIGNAL BANNER ----
+    const level = (d.market_signal_level || 'Neutral').toLowerCase();
+    const banner = document.getElementById('signalBanner');
+    banner.className = `signal-banner ${level}`;
+    banner.style.display = 'block';
+
+    document.getElementById('bannerTicker').textContent = d.ticker;
+    document.getElementById('bannerName').textContent = d.company_name || '';
+
+    const pill = document.getElementById('signalPill');
+    const pillClass = { elevated:'pill-elevated', watch:'pill-watch', positive:'pill-positive', neutral:'pill-neutral' };
+    pill.className = `signal-pill ${pillClass[level] || 'pill-neutral'}`;
+    pill.textContent = (d.market_signal_level || 'NEUTRAL').toUpperCase();
+
+    const price = d.current_price !== null ? `$${parseFloat(d.current_price).toFixed(2)}` : 'N/A';
+    document.getElementById('bannerPrice').textContent = price;
+
+    const changeEl = document.getElementById('bannerChange');
+    if (d.price_change !== null && d.price_change_pct !== null) {
+      const dir = d.price_change >= 0 ? 'up' : 'down';
+      const sign = d.price_change >= 0 ? '+' : '';
+      changeEl.className = `price-change ${dir}`;
+      changeEl.textContent = `${sign}${parseFloat(d.price_change).toFixed(2)} (${sign}${parseFloat(d.price_change_pct).toFixed(2)}%)`;
+    } else {
+      changeEl.textContent = '';
+    }
+
+    const mcap = d.market_cap_fmt || 'N/A';
+    const vol  = d.volume ? fmtNum(d.volume) : 'N/A';
+    const pos  = d.week_52_position !== null ? `${parseFloat(d.week_52_position).toFixed(0)}% of 52wk range` : '';
+    document.getElementById('bannerMeta').textContent =
+      [d.sector, d.industry, `Cap: ${mcap}`, `Vol: ${vol}`, pos].filter(Boolean).join('  ·  ');
+
+    const signalList = document.getElementById('signalList');
+    signalList.innerHTML = '';
+    (d.market_signals || []).forEach(s => {
+      const item = document.createElement('div');
+      item.className = `signal-item ${s.severity}`;
+      item.innerHTML = `<div>
+        <div class="signal-label">${s.signal}</div>
+        <div class="signal-detail">${s.detail}</div>
+      </div>`;
+      signalList.appendChild(item);
+    });
+
+    // ---- PROFILE ----
+    const pCls = (v) => v > 0 ? 'up' : (v < 0 ? 'down' : '');
+    document.getElementById('profileContent').innerHTML =
+      row('Sector', d.sector) +
+      row('Industry', d.industry) +
+      row('Country', d.country) +
+      row('Employees', d.employees ? fmtNum(d.employees) : null) +
+      row('Website', d.website && d.website !== 'N/A'
+        ? `<a href="${d.website}" target="_blank" style="color:#4fc3f7;text-decoration:none;">${d.website}</a>`
+        : null);
+    document.getElementById('row1').style.display = 'grid';
+
+    // ---- PRICE ----
+    const w52h = d.week_52_high ? `$${parseFloat(d.week_52_high).toFixed(2)}` : null;
+    const w52l = d.week_52_low  ? `$${parseFloat(d.week_52_low).toFixed(2)}`  : null;
+    const volVsAvg = d.volume_vs_avg ? `${parseFloat(d.volume_vs_avg).toFixed(0)}% of avg` : null;
+
+    document.getElementById('priceContent').innerHTML =
+      row('Current Price', d.current_price ? `$${parseFloat(d.current_price).toFixed(2)}` : null) +
+      row('Previous Close', d.previous_close ? `$${parseFloat(d.previous_close).toFixed(2)}` : null) +
+      row('Day High / Low',
+        (d.day_high && d.day_low)
+          ? `$${parseFloat(d.day_high).toFixed(2)} / $${parseFloat(d.day_low).toFixed(2)}`
+          : null) +
+      row('52-Wk High / Low',
+        (w52h && w52l) ? `${w52h} / ${w52l}` : null) +
+      row('52-Wk Position',
+        d.week_52_position !== null ? `${parseFloat(d.week_52_position).toFixed(1)}%` : null) +
+      row('Market Cap', d.market_cap_fmt || null) +
+      row('Volume', d.volume ? fmtNum(d.volume) : null) +
+      row('Avg Volume', d.avg_volume ? fmtNum(d.avg_volume) : null) +
+      row('Vol vs Avg', volVsAvg,
+        d.volume_vs_avg > 200 ? 'down' : (d.volume_vs_avg > 130 ? '' : '')) +
+      row('Beta', d.beta ? parseFloat(d.beta).toFixed(2) : null);
+
+    // ---- VALUATION ----
+    document.getElementById('valuationContent').innerHTML =
+      row('Trailing P/E', d.pe_ratio ? parseFloat(d.pe_ratio).toFixed(1) + 'x' : null,
+        d.pe_ratio > 50 ? 'down' : (d.pe_ratio < 10 ? 'up' : '')) +
+      row('Forward P/E', d.forward_pe ? parseFloat(d.forward_pe).toFixed(1) + 'x' : null) +
+      row('PEG Ratio', d.peg_ratio ? parseFloat(d.peg_ratio).toFixed(2) : null) +
+      row('Price / Book', d.price_to_book ? parseFloat(d.price_to_book).toFixed(2) + 'x' : null) +
+      row('Price / Sales', d.price_to_sales ? parseFloat(d.price_to_sales).toFixed(2) + 'x' : null) +
+      row('EV / EBITDA', d.ev_to_ebitda ? parseFloat(d.ev_to_ebitda).toFixed(1) + 'x' : null) +
+      row('EV / Revenue', d.ev_to_revenue ? parseFloat(d.ev_to_revenue).toFixed(2) + 'x' : null);
+    document.getElementById('row2').style.display = 'grid';
+
+    // ---- EARNINGS ----
+    document.getElementById('earningsContent').innerHTML =
+      row('Revenue (TTM)', d.revenue_ttm_fmt || null) +
+      row('Revenue Growth', d.revenue_growth_fmt || null,
+        d.revenue_growth > 0 ? 'up' : (d.revenue_growth < 0 ? 'down' : '')) +
+      row('Earnings Growth', d.earnings_growth_fmt || null,
+        d.earnings_growth > 0 ? 'up' : (d.earnings_growth < 0 ? 'down' : '')) +
+      row('EPS (TTM)', d.eps_ttm ? `$${parseFloat(d.eps_ttm).toFixed(2)}` : null) +
+      row('EPS (Forward)', d.eps_forward ? `$${parseFloat(d.eps_forward).toFixed(2)}` : null) +
+      row('Gross Margin', d.gross_margins_fmt || null) +
+      row('Operating Margin', d.operating_margins_fmt || null) +
+      row('Profit Margin', d.profit_margins_fmt || null,
+        d.profit_margins < 0 ? 'down' : '') +
+      row('Next Earnings', d.earnings_date || null);
+
+    // ---- BALANCE SHEET ----
+    document.getElementById('balanceContent').innerHTML =
+      row('Total Cash', d.total_cash_fmt || null) +
+      row('Total Debt', d.total_debt_fmt || null) +
+      row('Debt / Equity',
+        d.debt_to_equity ? parseFloat(d.debt_to_equity).toFixed(0) + '%' : null,
+        d.debt_to_equity > 200 ? 'down' : '') +
+      row('Current Ratio', d.current_ratio ? parseFloat(d.current_ratio).toFixed(2) : null) +
+      row('Quick Ratio', d.quick_ratio ? parseFloat(d.quick_ratio).toFixed(2) : null) +
+      row('Free Cash Flow', d.free_cash_flow_fmt || null) +
+      row('Return on Equity', d.return_on_equity_fmt || null,
+        d.return_on_equity > 0 ? 'up' : (d.return_on_equity < 0 ? 'down' : '')) +
+      row('Return on Assets', d.return_on_assets_fmt || null,
+        d.return_on_assets > 0 ? 'up' : (d.return_on_assets < 0 ? 'down' : ''));
+
+    // ---- ANALYST ----
+    const upsideDir = d.upside_to_target >= 30 ? 'up' : (d.upside_to_target <= -15 ? 'down' : '');
+    const upsideStr = d.upside_to_target !== null
+      ? `${d.upside_to_target >= 0 ? '+' : ''}${parseFloat(d.upside_to_target).toFixed(1)}%`
+      : null;
+    document.getElementById('analystContent').innerHTML =
+      row('Recommendation', d.recommendation || null) +
+      row('Price Target (Mean)', d.analyst_target ? `$${parseFloat(d.analyst_target).toFixed(2)}` : null) +
+      row('Target High', d.analyst_high ? `$${parseFloat(d.analyst_high).toFixed(2)}` : null) +
+      row('Target Low', d.analyst_low ? `$${parseFloat(d.analyst_low).toFixed(2)}` : null) +
+      row('Upside to Target', upsideStr, upsideDir) +
+      row('# of Analysts', d.analyst_count || null);
+    document.getElementById('row3').style.display = 'grid';
+
+    // ---- DIVIDEND ----
+    document.getElementById('dividendContent').innerHTML =
+      row('Dividend Rate', d.dividend_rate ? `$${parseFloat(d.dividend_rate).toFixed(2)}/yr` : 'None') +
+      row('Dividend Yield', d.dividend_yield
+        ? (parseFloat(d.dividend_yield) * 100).toFixed(2) + '%' : 'None') +
+      row('Payout Ratio', d.payout_ratio
+        ? (parseFloat(d.payout_ratio) * 100).toFixed(1) + '%' : 'N/A');
+
+    // ---- BUSINESS SUMMARY ----
+    if (d.business_summary && d.business_summary !== 'No description available.') {
+      document.getElementById('summaryContent').textContent = d.business_summary;
+      document.getElementById('row4').style.display = 'block';
+    }
+
+    // ---- NEWS ----
+    const news = d.news || [];
+    if (news.length > 0) {
+      const newsEl = document.getElementById('newsContent');
+      newsEl.innerHTML = '';
+      news.forEach(n => {
+        const item = document.createElement('div');
+        item.className = 'news-item';
+        const link = n.url
+          ? `<a href="${n.url}" target="_blank">${n.title}</a>`
+          : n.title;
+        item.innerHTML = `
+          <div class="news-title">${link}</div>
+          ${n.source ? `<div class="news-meta">${n.source}${n.published ? '  ·  ' + n.published : ''}</div>` : ''}
+          ${n.summary ? `<div class="news-summary">${n.summary}</div>` : ''}
+        `;
+        newsEl.appendChild(item);
+      });
+      document.getElementById('row5').style.display = 'block';
+    }
+
+    if (d.generated_at) {
+      document.getElementById('generatedAt').textContent = `Generated: ${d.generated_at}`;
+    }
+  }
+
+  document.getElementById('tickerInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') loadStock();
+  });
+
+  // Auto-load from URL param
+  (function init() {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('ticker');
+    if (t) {
+      document.getElementById('tickerInput').value = t.toUpperCase();
+      loadStock();
+    }
+  })();
+</script>
+</body>
+</html>

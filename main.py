@@ -8,11 +8,12 @@ from ai_engine import generate_executive_brief
 from quiet_signals_engine import build_quiet_signals
 from executive_risk_engine import calculate_executive_risk_score
 from market_brief_engine import generate_market_brief
+from stock_analysis_engine import build_stock_analysis
 
 app = FastAPI(
     title="CounselIQ API",
     description="Executive intelligence platform for SEC filings, leadership signals, and corporate strategy.",
-    version="0.4.0",
+    version="0.5.0",
 )
 
 # Allow local dashboard access
@@ -34,6 +35,7 @@ def home():
         "available_endpoints": [
             "/brief/{ticker}",
             "/market-brief",
+            "/stock/{ticker}",
         ],
     }
 
@@ -112,3 +114,8 @@ def get_company_brief(ticker: str):
         # Future intelligence modules
         "insider_activity": "Pending insider analysis.",
     }
+
+
+@app.get("/stock/{ticker}")
+def get_stock_analysis(ticker: str):
+    return build_stock_analysis(ticker)
