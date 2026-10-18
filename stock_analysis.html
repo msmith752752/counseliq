@@ -286,8 +286,8 @@
 <nav>
   <div class="nav-brand">COUNSEL<span style="color:#e0f0ff">IQ</span></div>
   <div class="nav-links">
-    <a href="dashboard.html">Single Ticker</a>
-    <a href="market_brief.html">Market Brief</a>
+    <a href="dashboard.html" id="nav-single">Single Ticker</a>
+    <a href="market_brief.html" id="nav-market">Market Brief</a>
     <a href="stock_analysis.html" class="active">Stock Analysis</a>
   </div>
 </nav>
@@ -634,12 +634,23 @@
     if (e.key === 'Enter') loadStock();
   });
 
+  function updateNavTicker() {
+    const t = document.getElementById('tickerInput').value.trim().toUpperCase();
+    if (t) {
+      document.getElementById('nav-single').href = `/ui/dashboard.html?ticker=${t}`;
+      document.getElementById('nav-market').href = `/ui/market_brief.html?ticker=${t}`;
+    }
+  }
+
+  document.getElementById('tickerInput').addEventListener('input', updateNavTicker);
+
   // Auto-load from URL param
   (function init() {
     const params = new URLSearchParams(window.location.search);
     const t = params.get('ticker');
     if (t) {
       document.getElementById('tickerInput').value = t.toUpperCase();
+      updateNavTicker();
       loadStock();
     }
   })();

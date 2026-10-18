@@ -398,9 +398,9 @@
       </div>
 
       <div class="header-right">
-        <a href="/ui/market_brief.html" class="nav-link">Market Brief</a>
+        <a href="/ui/market_brief.html" class="nav-link" id="nav-market">Market Brief</a>
         <a href="/ui/dashboard.html" class="nav-link active">Single Ticker</a>
-        <a href="/ui/stock_analysis.html" class="nav-link">Stock Analysis</a>
+        <a href="/ui/stock_analysis.html" class="nav-link" id="nav-stock">Stock Analysis</a>
         <div class="search">
           <input id="tickerInput" value="AAPL" />
           <button onclick="loadBrief()">Analyze</button>
@@ -856,6 +856,16 @@
       }
     }
 
+    function updateNavTicker() {
+      const t = document.getElementById("tickerInput").value.trim().toUpperCase();
+      if (t) {
+        document.getElementById("nav-market").href = `/ui/market_brief.html?ticker=${t}`;
+        document.getElementById("nav-stock").href = `/ui/stock_analysis.html?ticker=${t}`;
+      }
+    }
+
+    document.getElementById("tickerInput").addEventListener("input", updateNavTicker);
+
     // On page load: read ?ticker= param from URL, set input, and auto-load
     (function init() {
       const params = new URLSearchParams(window.location.search);
@@ -863,6 +873,7 @@
       if (tickerParam) {
         document.getElementById("tickerInput").value = tickerParam.toUpperCase();
       }
+      updateNavTicker();
       loadBrief();
     })();
   </script>

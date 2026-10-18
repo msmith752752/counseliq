@@ -549,9 +549,9 @@
         <p>Corporate behavioral intelligence from SEC filings</p>
       </div>
       <div class="header-right">
-        <a href="/ui/dashboard.html" class="nav-link">Single Ticker</a>
+        <a href="/ui/dashboard.html" class="nav-link" id="nav-single">Single Ticker</a>
         <a href="/ui/market_brief.html" class="nav-link active">Market Brief</a>
-        <a href="/ui/stock_analysis.html" class="nav-link">Stock Analysis</a>
+        <a href="/ui/stock_analysis.html" class="nav-link" id="nav-stock">Stock Analysis</a>
         <button class="refresh-btn" id="refreshBtn" onclick="loadBrief()">Refresh Brief</button>
       </div>
     </div>
@@ -841,6 +841,9 @@
               <button class="view-full-btn" onclick="openFullBrief('${brief.ticker}')">
                 View full brief for ${brief.ticker} →
               </button>
+              <button class="view-full-btn" onclick="window.location.href='/ui/stock_analysis.html?ticker=${brief.ticker}'" style="margin-left:8px;">
+                Stock analysis for ${brief.ticker} →
+              </button>
             </div>
           </td>
         `;
@@ -896,6 +899,13 @@
 
         const briefs = data.ranked_company_briefs || [];
         const top = data.top_executive_risk;
+
+        // Wire nav links to the highest-risk ticker so tab-switching preserves context
+        if (briefs.length > 0) {
+          const topTicker = briefs[0].ticker;
+          document.getElementById("nav-single").href = `/ui/dashboard.html?ticker=${topTicker}`;
+          document.getElementById("nav-stock").href = `/ui/stock_analysis.html?ticker=${topTicker}`;
+        }
 
         document.getElementById("timestamp").textContent =
           "Generated: " + (data.generated_at || new Date().toLocaleString());
